@@ -41,7 +41,11 @@ function updateSpaceship(rotation, thrust) {
   const initialVelocityX = spaceship.hSpeed;
   const initialVelocityY = spaceship.vSpeed;
   spaceship.angle = clamp(
-    clamp(clamp(rotation, -15, 15) + spaceship.angle, -90, rotation),
+    clamp(
+      clamp(rotation, -15, 15) + spaceship.angle,
+      -Math.abs(rotation),
+      Math.abs(rotation)
+    ),
     -90,
     90
   );
@@ -62,7 +66,7 @@ function updateSpaceship(rotation, thrust) {
 //RUN
 spaceship.draw();
 for (let t = 1; t < 72; t++) {
-  updateSpaceship(21, 3);
+  updateSpaceship(-21, 3);
   spaceship.draw();
   const spaceshipReadOut = { ...spaceship };
   for (let key of Object.keys(spaceshipReadOut)) {
