@@ -1,6 +1,7 @@
 const GRAVITY = -3.711;
-let canvas = document.getElementById("game");
-let context = canvas.getContext("2d");
+const canvas = document.getElementById("game");
+const context = canvas.getContext("2d");
+context.scale(0.1, 0.1);
 
 //utility function to adapt to coordinate system of canvas
 function getYCoord(Y) {
@@ -8,18 +9,24 @@ function getYCoord(Y) {
 }
 const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
 
-//draw geography
-context.scale(0.1, 0.1);
-context.beginPath();
-context.moveTo(0, getYCoord(100));
-context.lineTo(1000, getYCoord(500));
-context.lineTo(1500, getYCoord(1500));
-context.lineTo(3000, getYCoord(1000));
-context.lineTo(4000, getYCoord(150));
-context.lineTo(5500, getYCoord(150));
-context.lineTo(6999, getYCoord(800));
-context.strokeStyle = "#fc0505";
-context.stroke();
+const geography = {
+  g1: [0, 100],
+  g2: [1000, 500],
+  g3: [1500, 1500],
+  g4: [3000, 1000],
+  g5: [4000, 150],
+  g6: [5500, 150],
+  g7: [6999, 800],
+  draw() {
+    context.beginPath();
+    context.moveTo(this.g1[0], getYCoord(this.g1[1]));
+    Object.values(this).forEach((arr) =>
+      context.lineTo(arr[0], getYCoord(arr[1]))
+    );
+    context.strokeStyle = "#fc0505";
+    context.stroke();
+  },
+};
 
 const spaceship = {
   X: 2500,
@@ -36,7 +43,6 @@ const spaceship = {
   },
 };
 
-//clamping does not work if negative rotation. It moves in larger jumps that 15deg.
 function updateSpaceship(rotation, thrust) {
   const initialVelocityX = spaceship.hSpeed;
   const initialVelocityY = spaceship.vSpeed;
@@ -64,6 +70,7 @@ function updateSpaceship(rotation, thrust) {
 }
 
 //RUN
+geography.draw();
 spaceship.draw();
 for (let t = 1; t < 72; t++) {
   updateSpaceship(-21, 3);
