@@ -54,9 +54,9 @@ function getSurfaceY(x) {
       y2 = geoYCoords[i + 1];
     }
   }
-  let m = Math.abs(y2 - y1) / Math.abs(x2 - x1);
-  b = y1 - m * x1;
-  return -m * x + b;
+  const m = (y2 - y1) / (x2 - x1);
+  const b = y1 - m * x1;
+  return m * x + b;
 }
 
 const spaceship = {
@@ -105,7 +105,7 @@ function updateSpaceship(rotation, thrust) {
 //RUN
 geography.draw();
 spaceship.draw();
-for (let t = 1; t < 75; t++) {
+for (let t = 1; t < 80; t++) {
   updateSpaceship(21, 3);
   spaceship.draw();
   //create object clone to round numbers for display
