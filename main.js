@@ -28,6 +28,37 @@ const geography = {
   },
 };
 
+function getSurfaceY(x) {
+  //return undefined if x falls outside of field
+  if (x < 0 || x > 7000) return undefined;
+  let geoXCoords = [];
+  let geoYCoords = [];
+  Object.values(geography).forEach((arr) => {
+    if (arr[0] != undefined) geoXCoords.push(arr[0]);
+    if (arr[1] != undefined) geoYCoords.push(arr[1]);
+  });
+  //determine geography segment x falls on
+  let x1 = 0;
+  let y1 = 0;
+  let x2 = 0;
+  let y2 = 0;
+  for (let i = 0; i < geoXCoords.length; i++) {
+    // if x is a geogrpahy point, return associated Y
+    if (x === geoXCoords[i]) {
+      return geoYCoords[i];
+    }
+    if (x >= geoXCoords[i] && x < geoXCoords[i + 1]) {
+      x1 = geoXCoords[i];
+      y1 = geoYCoords[i];
+      x2 = geoXCoords[i + 1];
+      y2 = geoYCoords[i + 1];
+    }
+  }
+  let m = Math.abs(y2 - y1) / Math.abs(x2 - x1);
+  b = y1 - m * x1;
+  return -m * x + b;
+}
+
 const spaceship = {
   X: 2500,
   Y: 2700,
@@ -39,6 +70,7 @@ const spaceship = {
   draw(x = this.X, y = this.Y) {
     context.beginPath();
     context.arc(x, getYCoord(y), 50, 0, Math.PI * 2);
+    context.fillStyle = this.altitude < 0 ? "red" : "black";
     context.fill();
   },
 };
@@ -67,15 +99,18 @@ function updateSpaceship(rotation, thrust) {
   spaceship.X += (1 / 2) * (initialVelocityX + spaceship.hSpeed);
   spaceship.Y += (1 / 2) * (initialVelocityY + spaceship.vSpeed);
   spaceship.fuel -= spaceship.power * 10;
+  spaceship["altitude"] = spaceship.Y - getSurfaceY(spaceship.X);
 }
 
 //RUN
 geography.draw();
 spaceship.draw();
-for (let t = 1; t < 72; t++) {
-  updateSpaceship(-21, 3);
+for (let t = 1; t < 75; t++) {
+  updateSpaceship(21, 3);
   spaceship.draw();
+  //create object clone to round numbers for display
   const spaceshipReadOut = { ...spaceship };
+  //round numbers for display
   for (let key of Object.keys(spaceshipReadOut)) {
     if (
       typeof spaceshipReadOut[key] === "number" &&
@@ -84,5 +119,11 @@ for (let t = 1; t < 72; t++) {
       spaceshipReadOut[key] = Math.round(spaceshipReadOut[key]);
     }
   }
-  console.log(t, spaceshipReadOut);
+  console.log(
+    t,
+    spaceshipReadOut,
+    `altitude: ${spaceship.altitude}`,
+    `surface: ${getSurfaceY(spaceship.X)}`,
+    context.fillStyle
+  );
 }
