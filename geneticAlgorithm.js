@@ -1,34 +1,28 @@
 function random(min, max) {
   min = Math.ceil(min);
   max = Math.floor(max);
-
   // The maximum is exclusive and the minimum is inclusive
   return Math.floor(Math.random() * (max - min)) + min;
 }
 
-function generateRotCmd() {
-  // generate random INT 0-15 (max angle change per turn is 15)
-  return random(-15, 16);
-}
-function generatePowCmd() {
-  // generate random INT 0-1 (max power change per turn is 1)
-  return random(0, 2);
+function generateCmd() {
+  // generate random command string, clamp rotation: -15-15, thrust: 0-1
+  return `${random(-15, 16)} ${random(-1, 2)}`;
 }
 
 class Member {
   constructor(nCmd) {
-    this.nCmd = nCmd;
     this.cmd = [];
 
     for (let i = 0; i < nCmd; i++) {
-      this.cmd[i] = `${generateRotCmd()} ${generatePowCmd()}`;
+      this.cmd[i] = generateCmd();
     }
   }
   fitness() {
     let match = 0;
 
-    for (let i = 0; i < this.keys.length; i += 1) {
-      if (this.keys[i] === this.nCmd[i]) {
+    for (let i = 0; i < this.cmd.length; i += 1) {
+      if (this.cmd[i] === this.cmd[i]) {
         match += 1;
       }
     }
@@ -129,3 +123,4 @@ function generate(populationSize, nCmd, mutationRate, generations) {
 }
 
 //generate(100, "hit", 0.03, 5);
+console.log(new Member(50).cmd);

@@ -1,13 +1,49 @@
 const GRAVITY = -3.711;
+const vSpeedMax = -40;
+const hSpeedMax = 20; // must be referenced with Absolute value at all times.
 const canvas = document.getElementById("game");
 const context = canvas.getContext("2d");
 context.scale(0.1, 0.1);
 
 //utility function to adapt to coordinate system of canvas
-function getYCoord(Y) {
-  return Math.abs(Y - 3000);
-}
+const getYCoord = (yCoord) => Math.abs(yCoord - 3000);
+//Utility function to limit angle and thrust changes to maximum per turn
 const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
+
+function random(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  // The maximum is exclusive and the minimum is inclusive
+  return Math.floor(Math.random() * (max - min)) + min;
+}
+
+function generateCmd() {
+  // generate random command string, clamp rotation: -15-15, thrust: 0-1
+  return `${random(-15, 16)} ${random(-1, 2)}`;
+}
+
+class Member {
+  constructor(nCmd) {
+    this.cmd = [];
+
+    for (let i = 0; i < nCmd; i++) {
+      this.cmd[i] = generateCmd();
+    }
+  }
+}
+
+class Population {
+  constructor(size, nCmd) {
+    size = size || 1;
+    this.members = [];
+
+    for (let i = 0; i < size; i += 1) {
+      this.members.push(new Member(nCmd));
+    }
+  }
+}
+
+console.log(new Population(2, 4));
 
 const geography = {
   g1: [0, 100],
@@ -103,10 +139,19 @@ function updateSpaceship(rotation, thrust) {
 }
 
 //RUN
+let trajectory = new Member(80);
+let rot = 0;
+let pow = 0;
 geography.draw();
 spaceship.draw();
-for (let t = 1; t < 80; t++) {
-  updateSpaceship(21, 3);
+for (let i = 0; i < trajectory.cmd.length; i++) {
+  if (spaceship.altitude < 0) break;
+  //gameloop conditionals
+  rot += Number.parseInt(trajectory.cmd[i].split(" ")[0]);
+  pow += Number.parseInt(trajectory.cmd[i].split(" ")[1]);
+
+  //update graphical position
+  updateSpaceship(rot, pow);
   spaceship.draw();
   //create object clone to round numbers for display
   const spaceshipReadOut = { ...spaceship };
@@ -120,10 +165,9 @@ for (let t = 1; t < 80; t++) {
     }
   }
   console.log(
-    t,
+    i,
     spaceshipReadOut,
     `altitude: ${spaceship.altitude}`,
-    `surface: ${getSurfaceY(spaceship.X)}`,
-    context.fillStyle
+    `surface: ${getSurfaceY(spaceship.X)}`
   );
 }
