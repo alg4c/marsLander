@@ -27,7 +27,6 @@ class Member {
         match += 1;
       }
     }
-
     return match / this.nCmd.length;
   }
   crossover(partner) {

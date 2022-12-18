@@ -7,9 +7,11 @@ const context = canvas.getContext("2d");
 context.scale(0.1, 0.1);
 
 const getYCoord = (yCoord) => Math.abs(yCoord - 3000);
+
 const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
+
 const dist = (x1, y1, x2, y2) =>
-  Math.sqrt(Math.pow(y2 - y1, 2) + Math.pow(x2 - x1, 2));
+  Math.abs(Math.sqrt(Math.pow(y2 - y1, 2) + Math.pow(x2 - x1, 2)));
 
 function random(min, max) {
   min = Math.ceil(min);
@@ -31,16 +33,16 @@ class Member {
       this.cmd[i] = generateCmd();
     }
   }
-  fitness() {
+  fitness(ship) {
     //fitness ratio is a number between 0 and 1, 1 being most fit.
-    let distanceToGoal = dist(vessel.X, vessel.Y);
-
-    for (let i = 0; i < this.cmd.length; i += 1) {
-      if (this.cmd[i] === this.cmd[i]) {
-        match += 1;
-      }
-    }
-    return match / this.nCmd.length;
+    // currently only calculated on how close end state is to center of landing zone.
+    let distanceToGoal = dist(
+      ship.X,
+      ship.Y,
+      geography.getLZ()[1] - geography.getLZ()[0],
+      geography.getLZ()[2]
+    );
+    return distanceToGoal;
   }
 }
 
@@ -67,10 +69,9 @@ const geography = {
     const valArr = Object.values(this)
       .filter((x) => typeof x != "function")
       .flat();
-    console.log(valArr);
     for (let i = 1; i < valArr.length; i += 2) {
       if (valArr[i] === valArr[i - 2]) {
-        return [valArr[i - 3], valArr[i - 1]];
+        return [valArr[i - 3], valArr[i - 1], valArr[i]]; // returns LZ data as Array [x1, x2, y]
       }
     }
   },
@@ -84,7 +85,6 @@ const geography = {
     context.stroke();
   },
 };
-console.log(geography.getLZ());
 
 function getSurfaceY(x) {
   //return undefined if x falls outside of field
@@ -170,8 +170,9 @@ function updateSpaceship(rotation, thrust, vessel) {
   vessel["altitude"] = vessel.Y - getSurfaceY(vessel.X);
 }
 
-/*//RUN
-let population = new Population(5, 80);
+//RUN
+let population = new Population(10, 100);
+console.log(population.members[0].cmd);
 for (let m = 0; m < population.members.length; m++) {
   console.error(`Population# ${m + 1} / ${population.members.length}`);
   let trajectory = population.members[m];
@@ -209,6 +210,7 @@ for (let m = 0; m < population.members.length; m++) {
     );
   }
   //create paragraphs to display final results for each FP here.
+  console.log(population.members[m].fitness(vessel));
   const para = document.createElement("p");
   for (const [key, value] of Object.entries(vessel)) {
     let text = document.createTextNode(`\n${key}:${Math.round(value)},`);
@@ -217,4 +219,3 @@ for (let m = 0; m < population.members.length; m++) {
   }
   //after this code will loop and create new vessel
 }
-*/
