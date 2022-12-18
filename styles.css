@@ -1,5 +1,4 @@
 body {
-  height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -9,4 +8,21 @@ body {
 
 canvas {
   border: solid 1px black;
+}
+
+.mission {
+  margin-top: 10px;
+  background-color: gray;
+  width: auto;
+  padding: 20px;
+}
+
+.FPgridContainer > p {
+  color: whitesmoke;
+}
+
+.FPgridContainer {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 5px;
 }

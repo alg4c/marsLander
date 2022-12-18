@@ -1,10 +1,8 @@
 const INITIAL_X_POS = 2500;
 const INITIAL_Y_POS = 2700;
 const GRAVITY = -3.711;
-
-const vSpeedMax = -40;
-const hSpeedMax = 20; // must be referenced with Absolute value at all times.
-const canvas = document.getElementById("game");
+const FPgrid = document.querySelector(".FPgridContainer");
+const canvas = document.querySelector("#game");
 const context = canvas.getContext("2d");
 context.scale(0.1, 0.1);
 
@@ -98,7 +96,7 @@ function getSurfaceY(x) {
 
 class Spaceship {
   constructor(iteration, X, Y) {
-    this.iteration = 0;
+    this.iteration = iteration + 1;
     this.X = INITIAL_X_POS;
     this.Y = INITIAL_Y_POS;
     this.hSpeed = 0;
@@ -142,7 +140,7 @@ function updateSpaceship(rotation, thrust, vessel) {
 }
 
 //RUN
-let population = new Population(20, 80);
+let population = new Population(300, 80);
 for (let m = 0; m < population.members.length; m++) {
   console.error(`Population# ${m + 1} / ${population.members.length}`);
   let trajectory = population.members[m];
@@ -178,5 +176,12 @@ for (let m = 0; m < population.members.length; m++) {
       `altitude: ${SpaceshipReadOut.altitude}`,
       `surface: ${getSurfaceY(SpaceshipReadOut.X)}`
     );
+  }
+  //create paragraphs to display final results for each FP here.
+  const para = document.createElement("p");
+  for (const [key, value] of Object.entries(vessel)) {
+    let text = document.createTextNode(`\n${key}:${Math.ceil(value)},`);
+    para.appendChild(text);
+    FPgrid.appendChild(para);
   }
 }
