@@ -6,10 +6,10 @@ const canvas = document.querySelector("#game");
 const context = canvas.getContext("2d");
 context.scale(0.1, 0.1);
 
-//utility function to adapt to coordinate system of canvas
 const getYCoord = (yCoord) => Math.abs(yCoord - 3000);
-//Utility function to limit angle and thrust changes to maximum per turn
 const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
+const dist = (x1, y1, x2, y2) =>
+  Math.sqrt(Math.pow(y2 - y1, 2) + Math.pow(x2 - x1, 2));
 
 function random(min, max) {
   min = Math.ceil(min);
@@ -30,6 +30,17 @@ class Member {
     for (let i = 0; i < nCmd; i++) {
       this.cmd[i] = generateCmd();
     }
+  }
+  fitness() {
+    //fitness ratio is a number between 0 and 1, 1 being most fit.
+    let distanceToGoal = dist(vessel.X, vessel.Y);
+
+    for (let i = 0; i < this.cmd.length; i += 1) {
+      if (this.cmd[i] === this.cmd[i]) {
+        match += 1;
+      }
+    }
+    return match / this.nCmd.length;
   }
 }
 
@@ -52,6 +63,17 @@ const geography = {
   g5: [4000, 150],
   g6: [5500, 150],
   g7: [6999, 800],
+  getLZ() {
+    const valArr = Object.values(this)
+      .filter((x) => typeof x != "function")
+      .flat();
+    console.log(valArr);
+    for (let i = 1; i < valArr.length; i += 2) {
+      if (valArr[i] === valArr[i - 2]) {
+        return [valArr[i - 3], valArr[i - 1]];
+      }
+    }
+  },
   draw() {
     context.beginPath();
     context.moveTo(this.g1[0], getYCoord(this.g1[1]));
@@ -62,6 +84,7 @@ const geography = {
     context.stroke();
   },
 };
+console.log(geography.getLZ());
 
 function getSurfaceY(x) {
   //return undefined if x falls outside of field
@@ -147,7 +170,7 @@ function updateSpaceship(rotation, thrust, vessel) {
   vessel["altitude"] = vessel.Y - getSurfaceY(vessel.X);
 }
 
-//RUN
+/*//RUN
 let population = new Population(5, 80);
 for (let m = 0; m < population.members.length; m++) {
   console.error(`Population# ${m + 1} / ${population.members.length}`);
@@ -194,3 +217,4 @@ for (let m = 0; m < population.members.length; m++) {
   }
   //after this code will loop and create new vessel
 }
+*/
