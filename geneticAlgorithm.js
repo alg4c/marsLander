@@ -19,6 +19,7 @@ class Member {
     }
   }
   fitness() {
+    //fitness ratio is a number between 0 and 1, 1 being most fit.
     let match = 0;
 
     for (let i = 0; i < this.cmd.length; i += 1) {
@@ -104,6 +105,7 @@ class Population {
   }
 }
 
+//function to run the GA
 function generate(populationSize, nCmd, mutationRate, generations) {
   // Create a population and evolve for N generations
   const population = new Population(populationSize, nCmd, mutationRate);

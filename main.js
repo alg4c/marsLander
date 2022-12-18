@@ -95,7 +95,7 @@ function getSurfaceY(x) {
 }
 
 class Spaceship {
-  constructor(iteration, X, Y) {
+  constructor(iteration) {
     this.iteration = iteration + 1;
     this.X = INITIAL_X_POS;
     this.Y = INITIAL_Y_POS;
@@ -108,7 +108,15 @@ class Spaceship {
   draw(x = this.X, y = this.Y) {
     context.beginPath();
     context.arc(x, getYCoord(y), 50, 0, Math.PI * 2);
-    context.fillStyle = this.altitude < 0 ? "red" : "black";
+    context.fillStyle =
+      this.altitude < 0 &&
+      Math.abs(15 - this.angle) >= 0 &&
+      this.vSpeed > -50 &&
+      Math.abs(this.hSpeed) <= 25
+        ? "green"
+        : this.altitude < 0
+        ? "red"
+        : "black";
     context.fill();
   }
 }
@@ -140,13 +148,13 @@ function updateSpaceship(rotation, thrust, vessel) {
 }
 
 //RUN
-let population = new Population(300, 80);
+let population = new Population(5, 80);
 for (let m = 0; m < population.members.length; m++) {
   console.error(`Population# ${m + 1} / ${population.members.length}`);
   let trajectory = population.members[m];
   let rot = 0;
   let pow = 0;
-  let vessel = new Spaceship(m, 2500, 2700);
+  let vessel = new Spaceship(m);
   geography.draw();
   vessel.draw();
   for (let i = 0; i < trajectory.cmd.length; i++) {
@@ -180,8 +188,9 @@ for (let m = 0; m < population.members.length; m++) {
   //create paragraphs to display final results for each FP here.
   const para = document.createElement("p");
   for (const [key, value] of Object.entries(vessel)) {
-    let text = document.createTextNode(`\n${key}:${Math.ceil(value)},`);
+    let text = document.createTextNode(`\n${key}:${Math.round(value)},`);
     para.appendChild(text);
     FPgrid.appendChild(para);
   }
+  //after this code will loop and create new vessel
 }
