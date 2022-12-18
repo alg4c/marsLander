@@ -1,4 +1,7 @@
+const INITIAL_X_POS = 2500;
+const INITIAL_Y_POS = 2700;
 const GRAVITY = -3.711;
+
 const vSpeedMax = -40;
 const hSpeedMax = 20; // must be referenced with Absolute value at all times.
 const canvas = document.getElementById("game");
@@ -42,8 +45,6 @@ class Population {
     }
   }
 }
-
-console.log(new Population(2, 4));
 
 const geography = {
   g1: [0, 100],
@@ -95,79 +96,87 @@ function getSurfaceY(x) {
   return m * x + b;
 }
 
-const spaceship = {
-  X: 2500,
-  Y: 2700,
-  hSpeed: 0,
-  vSpeed: 0,
-  fuel: 5501,
-  angle: 0,
-  power: 0,
+class Spaceship {
+  constructor(iteration, X, Y) {
+    this.iteration = 0;
+    this.X = INITIAL_X_POS;
+    this.Y = INITIAL_Y_POS;
+    this.hSpeed = 0;
+    this.vSpeed = 0;
+    this.fuel = 5501;
+    this.angle = 0;
+    this.power = 0;
+  }
   draw(x = this.X, y = this.Y) {
     context.beginPath();
     context.arc(x, getYCoord(y), 50, 0, Math.PI * 2);
     context.fillStyle = this.altitude < 0 ? "red" : "black";
     context.fill();
-  },
-};
+  }
+}
 
-function updateSpaceship(rotation, thrust) {
-  const initialVelocityX = spaceship.hSpeed;
-  const initialVelocityY = spaceship.vSpeed;
-  spaceship.angle = clamp(
+function updateSpaceship(rotation, thrust, vessel) {
+  const initialVelocityX = vessel.hSpeed;
+  const initialVelocityY = vessel.vSpeed;
+  vessel.angle = clamp(
     clamp(
-      clamp(rotation, -15, 15) + spaceship.angle,
+      clamp(rotation, -15, 15) + vessel.angle,
       -Math.abs(rotation),
       Math.abs(rotation)
     ),
     -90,
     90
   );
-  spaceship.power = clamp(
-    clamp(clamp(thrust, -1, 1) + spaceship.power, 0, thrust),
+  vessel.power = clamp(
+    clamp(clamp(thrust, -1, 1) + vessel.power, 0, thrust),
     0,
     4
   );
-  spaceship.hSpeed +=
-    spaceship.power * Math.sin(spaceship.angle * (Math.PI / 180));
-  spaceship.vSpeed +=
-    spaceship.power * Math.cos(spaceship.angle * (Math.PI / 180)) + GRAVITY;
-  spaceship.X += (1 / 2) * (initialVelocityX + spaceship.hSpeed);
-  spaceship.Y += (1 / 2) * (initialVelocityY + spaceship.vSpeed);
-  spaceship.fuel -= spaceship.power * 10;
-  spaceship["altitude"] = spaceship.Y - getSurfaceY(spaceship.X);
+  vessel.hSpeed += vessel.power * Math.sin(vessel.angle * (Math.PI / 180));
+  vessel.vSpeed +=
+    vessel.power * Math.cos(vessel.angle * (Math.PI / 180)) + GRAVITY;
+  vessel.X += (1 / 2) * (initialVelocityX + vessel.hSpeed);
+  vessel.Y += (1 / 2) * (initialVelocityY + vessel.vSpeed);
+  vessel.fuel -= vessel.power * 10;
+  vessel["altitude"] = vessel.Y - getSurfaceY(vessel.X);
 }
 
 //RUN
-let trajectory = new Member(80);
-let rot = 0;
-let pow = 0;
-geography.draw();
-spaceship.draw();
-for (let i = 0; i < trajectory.cmd.length; i++) {
-  if (spaceship.altitude < 0) break;
-  //gameloop conditionals
-  rot += Number.parseInt(trajectory.cmd[i].split(" ")[0]);
-  pow += Number.parseInt(trajectory.cmd[i].split(" ")[1]);
-
-  //update graphical position
-  updateSpaceship(rot, pow);
-  spaceship.draw();
-  //create object clone to round numbers for display
-  const spaceshipReadOut = { ...spaceship };
-  //round numbers for display
-  for (let key of Object.keys(spaceshipReadOut)) {
-    if (
-      typeof spaceshipReadOut[key] === "number" &&
-      spaceshipReadOut[key] !== 0
-    ) {
-      spaceshipReadOut[key] = Math.round(spaceshipReadOut[key]);
+let population = new Population(20, 80);
+for (let m = 0; m < population.members.length; m++) {
+  console.error(`Population# ${m + 1} / ${population.members.length}`);
+  let trajectory = population.members[m];
+  let rot = 0;
+  let pow = 0;
+  let vessel = new Spaceship(m, 2500, 2700);
+  geography.draw();
+  vessel.draw();
+  for (let i = 0; i < trajectory.cmd.length; i++) {
+    if (vessel.altitude < 0) {
+      continue;
     }
+    //gameloop conditionals
+    rot += Number.parseInt(trajectory.cmd[i].split(" ")[0]);
+    pow += Number.parseInt(trajectory.cmd[i].split(" ")[1]);
+    //update graphical position
+    updateSpaceship(rot, pow, vessel);
+    vessel.draw();
+    //create object clone to round numbers for display
+    const SpaceshipReadOut = { ...vessel };
+    //round numbers for display
+    for (let key of Object.keys(SpaceshipReadOut)) {
+      if (
+        typeof SpaceshipReadOut[key] === "number" &&
+        SpaceshipReadOut[key] !== 0
+      ) {
+        SpaceshipReadOut[key] = Math.round(SpaceshipReadOut[key]);
+      }
+    }
+    console.log(
+      i,
+      SpaceshipReadOut,
+      `altitude: ${SpaceshipReadOut.altitude}`,
+      `surface: ${getSurfaceY(SpaceshipReadOut.X)}`
+    );
   }
-  console.log(
-    i,
-    spaceshipReadOut,
-    `altitude: ${spaceship.altitude}`,
-    `surface: ${getSurfaceY(spaceship.X)}`
-  );
 }
