@@ -25,38 +25,6 @@ function generateCmd() {
   return `${random(-15, 16)} ${random(-1, 2)}`;
 }
 
-class Member {
-  constructor(nCmd) {
-    this.cmd = [];
-
-    for (let i = 0; i < nCmd; i++) {
-      this.cmd[i] = generateCmd();
-    }
-  }
-  fitness(ship) {
-    //fitness ratio is a number between 0 and 1, 1 being most fit.
-    // currently only calculated on how close end state is to center of landing zone.
-    let distanceToGoal = dist(
-      ship.X,
-      ship.Y,
-      geography.getLZ()[1] - geography.getLZ()[0],
-      geography.getLZ()[2]
-    );
-    return distanceToGoal;
-  }
-}
-
-class Population {
-  constructor(size, nCmd) {
-    size = size || 1;
-    this.members = [];
-
-    for (let i = 0; i < size; i += 1) {
-      this.members.push(new Member(nCmd));
-    }
-  }
-}
-
 const geography = {
   g1: [0, 100],
   g2: [1000, 500],
@@ -85,6 +53,39 @@ const geography = {
     context.stroke();
   },
 };
+
+class Member {
+  constructor(nCmd) {
+    this.cmd = [];
+
+    for (let i = 0; i < nCmd; i++) {
+      this.cmd[i] = generateCmd();
+    }
+  }
+  fitness() {
+    //score landing spot, angle, vSpeed and hSpeed; assign overall fitness factor
+    const LZweightAvgRate = 0.25;
+    const angleWeightRate = 0.25;
+    const vSpeedWeightRate = 0.25;
+    const hSpeedWeightRate = 0.25;
+    let LZcenter = 100; //(geography.getLZ()[1] + geography.getLZ()[0]) / 2;
+    return 0; // return fitness score
+  }
+}
+//fitness testing
+let member = new Member(5);
+console.log(member.fitness());
+
+class Population {
+  constructor(size, nCmd) {
+    size = size || 1;
+    this.members = [];
+
+    for (let i = 0; i < size; i += 1) {
+      this.members.push(new Member(nCmd));
+    }
+  }
+}
 
 function getSurfaceY(x) {
   //return undefined if x falls outside of field
@@ -144,7 +145,7 @@ class Spaceship {
   }
 }
 
-function updateSpaceship(rotation, thrust, vessel) {
+function updateVessel(rotation, thrust, vessel) {
   const initialVelocityX = vessel.hSpeed;
   const initialVelocityY = vessel.vSpeed;
   vessel.angle = clamp(
@@ -171,8 +172,7 @@ function updateSpaceship(rotation, thrust, vessel) {
 }
 
 //RUN
-let population = new Population(10, 100);
-console.log(population.members[0].cmd);
+let population = new Population(5, 100);
 for (let m = 0; m < population.members.length; m++) {
   console.error(`Population# ${m + 1} / ${population.members.length}`);
   let trajectory = population.members[m];
@@ -189,7 +189,7 @@ for (let m = 0; m < population.members.length; m++) {
     rot += Number.parseInt(trajectory.cmd[i].split(" ")[0]);
     pow += Number.parseInt(trajectory.cmd[i].split(" ")[1]);
     //update graphical position
-    updateSpaceship(rot, pow, vessel);
+    updateVessel(rot, pow, vessel);
     vessel.draw();
     //create object clone to round numbers for display
     const SpaceshipReadOut = { ...vessel };
