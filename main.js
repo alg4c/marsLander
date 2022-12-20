@@ -1,30 +1,3 @@
-const INITIAL_X_POS = 2500;
-const INITIAL_Y_POS = 2700;
-const GRAVITY = -3.711;
-const FPgrid = document.querySelector(".FPgridContainer");
-const canvas = document.querySelector("#game");
-const context = canvas.getContext("2d");
-context.scale(0.1, 0.1);
-
-const getYCoord = (yCoord) => Math.abs(yCoord - 3000);
-
-const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
-
-const dist = (x1, y1, x2, y2) =>
-  Math.abs(Math.sqrt(Math.pow(y2 - y1, 2) + Math.pow(x2 - x1, 2)));
-
-function random(min, max) {
-  min = Math.ceil(min);
-  max = Math.floor(max);
-  // The maximum is exclusive and the minimum is inclusive
-  return Math.floor(Math.random() * (max - min)) + min;
-}
-
-function generateCmd() {
-  // generate random command string, clamp rotation: -15-15, thrust: 0-1
-  return `${random(-15, 16)} ${random(-1, 2)}`;
-}
-
 const geography = {
   g1: [0, 100],
   g2: [1000, 500],
@@ -54,6 +27,35 @@ const geography = {
   },
 };
 
+const INITIAL_X_POS = 2500;
+const INITIAL_Y_POS = 2700;
+const LZcenterX = (geography.getLZ()[1] + geography.getLZ()[0]) / 2;
+const INITIAL_DISTANCE_TO_CENTER = Math.abs(LZcenterX - INITIAL_X_POS);
+const GRAVITY = -3.711;
+const FPgrid = document.querySelector(".FPgridContainer");
+const canvas = document.querySelector("#game");
+const context = canvas.getContext("2d");
+context.scale(0.1, 0.1);
+
+const getYCoord = (yCoord) => Math.abs(yCoord - 3000);
+
+const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
+
+const dist = (x1, y1, x2, y2) =>
+  Math.abs(Math.sqrt(Math.pow(y2 - y1, 2) + Math.pow(x2 - x1, 2)));
+
+function random(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  // The maximum is exclusive and the minimum is inclusive
+  return Math.floor(Math.random() * (max - min)) + min;
+}
+
+function generateCmd() {
+  // generate random command string, clamp rotation: -15-15, thrust: 0-1
+  return `${random(-15, 16)} ${random(-1, 2)}`;
+}
+
 class Member {
   constructor(nCmd) {
     this.cmd = [];
@@ -62,19 +64,20 @@ class Member {
       this.cmd[i] = generateCmd();
     }
   }
-  fitness() {
+  fitness(vessel) {
     //score landing spot, angle, vSpeed and hSpeed; assign overall fitness factor
+    //fitness equation is not working correctly
     const LZweightAvgRate = 0.25;
     const angleWeightRate = 0.25;
     const vSpeedWeightRate = 0.25;
     const hSpeedWeightRate = 0.25;
-    let LZcenter = 100; //(geography.getLZ()[1] + geography.getLZ()[0]) / 2;
-    return 0; // return fitness score
+    let XdistanceToLZcenter = Math.abs(vessel.X - LZcenterX);
+    let normalized = (INITIAL_DISTANCE_TO_CENTER / XdistanceToLZcenter).toFixed(
+      3
+    );
+    return 1 - normalized; // return fitness score
   }
 }
-//fitness testing
-let member = new Member(5);
-console.log(member.fitness());
 
 class Population {
   constructor(size, nCmd) {
@@ -143,6 +146,15 @@ class Spaceship {
         : "black";
     context.fill();
   }
+  printDisplay() {
+    let display = {};
+    for (let key of Object.keys(this)) {
+      if (typeof this[key] === "number" && this[key] !== 0) {
+        display[key] = Math.round(this[key]);
+      }
+    }
+    return Object.entries(display).join(" | ").replaceAll(",", ":");
+  }
 }
 
 function updateVessel(rotation, thrust, vessel) {
@@ -172,7 +184,7 @@ function updateVessel(rotation, thrust, vessel) {
 }
 
 //RUN
-let population = new Population(5, 100);
+let population = new Population(1, 40);
 for (let m = 0; m < population.members.length; m++) {
   console.error(`Population# ${m + 1} / ${population.members.length}`);
   let trajectory = population.members[m];
@@ -191,31 +203,9 @@ for (let m = 0; m < population.members.length; m++) {
     //update graphical position
     updateVessel(rot, pow, vessel);
     vessel.draw();
-    //create object clone to round numbers for display
-    const SpaceshipReadOut = { ...vessel };
     //round numbers for display
-    for (let key of Object.keys(SpaceshipReadOut)) {
-      if (
-        typeof SpaceshipReadOut[key] === "number" &&
-        SpaceshipReadOut[key] !== 0
-      ) {
-        SpaceshipReadOut[key] = Math.round(SpaceshipReadOut[key]);
-      }
-    }
-    console.log(
-      i,
-      SpaceshipReadOut,
-      `altitude: ${SpaceshipReadOut.altitude}`,
-      `surface: ${getSurfaceY(SpaceshipReadOut.X)}`
-    );
+    console.log(i, vessel.printDisplay());
   }
-  //create paragraphs to display final results for each FP here.
-  console.log(population.members[m].fitness(vessel));
-  const para = document.createElement("p");
-  for (const [key, value] of Object.entries(vessel)) {
-    let text = document.createTextNode(`\n${key}:${Math.round(value)},`);
-    para.appendChild(text);
-    FPgrid.appendChild(para);
-  }
+  console.log(`fitness: ${trajectory.fitness(vessel)}`);
   //after this code will loop and create new vessel
 }

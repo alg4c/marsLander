@@ -8,6 +8,7 @@ Index.html file handles the html for the visual markup tool. Main.js runs the ph
 
 Notes
 TODO 11/29/2022 - Variable acceleration flight path of my app is slightly off of coding game's app. Test 1 yielded a delta of 16 x-dimension units. look into this discrepancy.
+TODO 12/20/2022 - I need to be able to interact with the visual debugger. It would be able to click or mouse over an FP/endpoint and get the object parameters at that point in the sim. Need to research how to interact with canvas. I think I need to rebuild entire visual debug in svg instead of canvas.
 
 SOLVED - The acceleration is actually not off. The flight path of the Lander is correct until it crashed. In the simulation, the numbers are calculated at the end of the full turn, which yields a negative altitude (inside mars.) This is not correct. I have to edit the simulation to report the final numbers when the lander contacts Mars' surface.
 
