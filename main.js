@@ -1,3 +1,7 @@
+const INITIAL_X_POS = 2500;
+const INITIAL_Y_POS = 2700;
+const GRAVITY = -3.711;
+
 const geography = {
   g1: [0, 100],
   g2: [1000, 500],
@@ -27,11 +31,6 @@ const geography = {
   },
 };
 
-const INITIAL_X_POS = 2500;
-const INITIAL_Y_POS = 2700;
-const LZcenterX = (geography.getLZ()[1] + geography.getLZ()[0]) / 2;
-const INITIAL_DISTANCE_TO_CENTER = Math.abs(LZcenterX - INITIAL_X_POS);
-const GRAVITY = -3.711;
 const FPgrid = document.querySelector(".FPgridContainer");
 const canvas = document.querySelector("#game");
 const context = canvas.getContext("2d");
@@ -65,17 +64,30 @@ class Member {
     }
   }
   fitness(vessel) {
-    //score landing spot, angle, vSpeed and hSpeed; assign overall fitness factor
-    //fitness equation is not working correctly
-    const LZweightAvgRate = 0.25;
-    const angleWeightRate = 0.25;
-    const vSpeedWeightRate = 0.25;
-    const hSpeedWeightRate = 0.25;
-    let XdistanceToLZcenter = Math.abs(vessel.X - LZcenterX);
-    let normalized = (INITIAL_DISTANCE_TO_CENTER / XdistanceToLZcenter).toFixed(
-      3
+    // fitness function takes an object and evaluates its fitness
+    //score angle, vSpeed, hSpeed, and fuel consumption; assign overall fitness factor
+    //weighting percentages below
+    const LZweightAvgRate = 0.2;
+    const angleWeightRate = 0.2;
+    const vSpeedWeightRate = 0.2;
+    const hSpeedWeightRate = 0.2;
+    const fuelWeightRate = 0.2;
+    let [LZxCoordWest, LZxCoordEast, _] = geography.getLZ();
+    let distanceFromNearestLZBorderXcoord = Math.min(
+      Math.abs(LZxCoordWest - vessel.X),
+      Math.abs(LZxCoordEast - vessel.X)
     );
-    return 1 - normalized; // return fitness score
+    let LZfitnessValue =
+      LZweightAvgRate *
+      (vessel.X > LZxCoordWest && vessel.X < LZxCoordEast
+        ? // if vessel inside the LZ return 1
+          1
+        : // if its outside the LZ return distance adjusted fitness score
+          (1 - distanceFromNearestLZBorderXcoord / 6999).toFixed(3));
+    //todo check fitness calc for angle
+    let angleFitnessValue =
+      Math.abs(vessel.angle) <= 15 ? 1 : 1 - vessel.angle / 90;
+    return angleFitnessValue; //LZfitnessValue;
   }
 }
 
@@ -184,7 +196,7 @@ function updateVessel(rotation, thrust, vessel) {
 }
 
 //RUN
-let population = new Population(1, 40);
+let population = new Population(1, 80);
 for (let m = 0; m < population.members.length; m++) {
   console.error(`Population# ${m + 1} / ${population.members.length}`);
   let trajectory = population.members[m];
