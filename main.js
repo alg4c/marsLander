@@ -67,6 +67,7 @@ class Member {
     // fitness function takes an object and evaluates its fitness
     //score angle, vSpeed, hSpeed, and fuel consumption; assign overall fitness factor
     //weighting percentages below
+    const MAX_ANGLE = 90;
     const LZweightAvgRate = 0.2;
     const angleWeightRate = 0.2;
     const vSpeedWeightRate = 0.2;
@@ -83,10 +84,11 @@ class Member {
         ? // if vessel inside the LZ return 1
           1
         : // if its outside the LZ return distance adjusted fitness score
-          (1 - distanceFromNearestLZBorderXcoord / 6999).toFixed(3));
+          1 - distanceFromNearestLZBorderXcoord / 6999);
     //todo check fitness calc for angle
     let angleFitnessValue =
-      Math.abs(vessel.angle) <= 15 ? 1 : 1 - vessel.angle / 90;
+      angleWeightRate *
+      (Math.abs(vessel.angle) <= 15 ? 1 : 1 - Math.abs(vessel.angle) / 90);
     return angleFitnessValue; //LZfitnessValue;
   }
 }
@@ -196,7 +198,7 @@ function updateVessel(rotation, thrust, vessel) {
 }
 
 //RUN
-let population = new Population(1, 80);
+let population = new Population(20, 80);
 for (let m = 0; m < population.members.length; m++) {
   console.error(`Population# ${m + 1} / ${population.members.length}`);
   let trajectory = population.members[m];
