@@ -1,3 +1,11 @@
+/*
+For a landing to be successful, the ship must:
+land on flat ground
+land in a vertical position (tilt angle = 0°)
+vertical speed must be limited ( ≤ 40m/s in absolute value)
+horizontal speed must be limited ( ≤ 20m/s in absolute value)
+*/
+
 const INITIAL_X_POS = 2500;
 const INITIAL_Y_POS = 2700;
 const GRAVITY = -3.711;
@@ -68,6 +76,8 @@ class Member {
     //score angle, vSpeed, hSpeed, and fuel consumption; assign overall fitness factor
     //weighting percentages below
     const MAX_ANGLE = 90;
+    const MAX_VSPEED = -40;
+    const MAX_HSPEED = 20;
     const LZweightAvgRate = 0.2;
     const angleWeightRate = 0.2;
     const vSpeedWeightRate = 0.2;
@@ -78,6 +88,7 @@ class Member {
       Math.abs(LZxCoordWest - vessel.X),
       Math.abs(LZxCoordEast - vessel.X)
     );
+    //LZ component
     let LZfitnessValue =
       LZweightAvgRate *
       (vessel.X > LZxCoordWest && vessel.X < LZxCoordEast
@@ -85,11 +96,28 @@ class Member {
           1
         : // if its outside the LZ return distance adjusted fitness score
           1 - distanceFromNearestLZBorderXcoord / 6999);
-    //todo check fitness calc for angle
+    //angle component
     let angleFitnessValue =
       angleWeightRate *
       (Math.abs(vessel.angle) <= 15 ? 1 : 1 - Math.abs(vessel.angle) / 90);
-    return angleFitnessValue; //LZfitnessValue;
+    //vSpeed component
+    let vSpeedFitnessValue =
+      vSpeedWeightRate *
+      (vessel.vSpeed >= MAX_VSPEED
+        ? 1
+        : Math.abs(vessel.vSpeed - MAX_VSPEED) / MAX_VSPEED);
+    //hSpeed component
+    let hSpeedFitnessValue =
+      hSpeedWeightRate *
+      (Math.abs(vessel.hSpeed) <= 20
+        ? 1
+        : 1 - (Math.abs(vessel.hSpeed) - MAX_HSPEED) / MAX_HSPEED);
+    return (
+      hSpeedFitnessValue +
+      vSpeedFitnessValue +
+      angleFitnessValue +
+      LZfitnessValue
+    );
   }
 }
 
