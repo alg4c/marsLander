@@ -1,0 +1,21 @@
+body {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  margin: 0;
+}
+
+svg {
+  border: solid 1px black;
+  margin: 20px;
+  transform: scaleY(-1);
+  display: block;
+}
+
+#geoline {
+  stroke-width: 1rem;
+  stroke: red;
+  fill: none;
+}
