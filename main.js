@@ -7,7 +7,6 @@ const geography = [
   [5500, 150],
   [6999, 800],
 ];
-
 const INITIAL_SHIP_X = 2500;
 const INITIAL_SHIP_Y = 2700;
 
@@ -56,8 +55,8 @@ function Ship(X, Y, hSpeed, vSpeed, fuel, angle, power, nCmd = 0) {
         ? this.angle
         : clamp(this.angle + rotation, -90, 90);
     */
-    //todo implement if fuel < thrust * 10 power = 0
     this.power = clamp(this.power + thrust, 0, 4);
+    if (this.fuel < this.power * 10) this.power = 0;
     /* this commented code block toggles "sticky" power
       this.power === thrust 
         ? this.power 
@@ -94,6 +93,6 @@ const ship = new Ship(2500, 2700, 0, 0, 5501, 0, 0);
 while (ship.Y >= getSurfaceY(ship.X)) {
   ship.print();
   console.log(getSurfaceY(ship.X));
-  ship.updateParameters([15, 1]);
+  ship.updateParameters([15, 3]);
 }
 drawLine(ship.coords, "vesselLine");
