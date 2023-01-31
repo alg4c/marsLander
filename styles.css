@@ -1,0 +1,26 @@
+body {
+  height: 100vh;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+svg {
+  transform: scaleY(-1);
+  border: 1px solid black;
+  margin-bottom: 20px;
+  max-width: 1800px;
+}
+
+.geoline {
+  fill: none;
+  stroke: red;
+  stroke-width: 1rem;
+}
+
+.vesselLine {
+  fill: none;
+  stroke: black;
+  stroke-width: 5px;
+}
