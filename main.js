@@ -35,9 +35,9 @@ function getLZ(g = geography) {
   }
 }
 
-function Ship(X, Y, hSpeed, vSpeed, fuel, angle, power, nCmd = 0) {
-  this.X = X;
-  this.Y = Y;
+function Ship(hSpeed, vSpeed, fuel, angle, power, nCmd = 0) {
+  this.X = INITIAL_SHIP_X;
+  this.Y = INITIAL_SHIP_Y;
   this.hSpeed = hSpeed;
   this.vSpeed = vSpeed;
   this.fuel = fuel;
@@ -72,6 +72,13 @@ function Ship(X, Y, hSpeed, vSpeed, fuel, angle, power, nCmd = 0) {
     this.fuel -= this.power * 10;
     this.coords.push([this.X, this.Y]);
   };
+  this.fitness = function () {
+    if (getSurfaceY(ship.X) === undefined) return 0;
+    const target = getLZ();
+    return ship.X >= target[0] && ship.X <= target[1]
+      ? 1
+      : 1 - Math.abs(ship.X - 4750) / 4750;
+  };
 }
 
 function getSurfaceY(shipX) {
@@ -88,11 +95,14 @@ function getSurfaceY(shipX) {
   console.error("Ship out of bounds");
 }
 
+//RUN//
 drawLine(geography, "geoline");
-const ship = new Ship(2500, 2700, 0, 0, 5501, 0, 0);
+const ship = new Ship(0, 0, 5501, 0, 0);
 while (ship.Y >= getSurfaceY(ship.X)) {
   ship.print();
   console.log(getSurfaceY(ship.X));
-  ship.updateParameters([15, 3]);
+  ship.updateParameters([0, 0]);
 }
 drawLine(ship.coords, "vesselLine");
+
+console.log(ship.fitness());
