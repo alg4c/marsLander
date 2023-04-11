@@ -1,5 +1,5 @@
 import { geography } from "./geography.js";
-import { intersect } from "./svg.js";
+import { drawLine, intersect } from "./svg.js";
 
 const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
 const deg_to_rad = (degrees) => degrees * (Math.PI / 180);
@@ -53,7 +53,9 @@ export const shipFactory = (cmdList) => {
       coordinates.push(Object.values(position));
     }
   }
-  return { position, velocity, angle, fuel, coordinates };
+  //draw final path of ship
+  drawLine(coordinates, "vesselLine");
+  return { position, velocity, angle, fuel };
 };
 
 /* this commented code block toggles "sticky" angle aka if angle is 1, it will remain at 1 instead of increasing to 90
