@@ -1,6 +1,5 @@
 import { shipFactory } from "./ship.js";
 import { geography } from "./geography.js";
-import { svg } from "./svg.js";
 
 const random = (min, max) => Math.floor(Math.random() * (max - min)) + min;
 
@@ -61,12 +60,19 @@ export function Population(size, nGenes, mutationRate) {
   this._selectMembersForMating = function () {
     const matingPool = [];
 
-    this.members.forEach((m) => {
+    for (const m of this.members) {
+      const fMax = 100; // maximum fitness based on fitness function
       const f = Math.floor(m.fitness(shipFactory(m.genes)) * 100) || 1;
+      // TODO if f == max, stop algo and return solution chrom
+
+      if (f == fMax) {
+        return m;
+      }
+
       for (let i = 0; i < f; i += 1) {
         matingPool.push(m);
       }
-    });
+    }
     return matingPool;
   };
   this._reproduce = function (matingPool) {
@@ -87,6 +93,7 @@ export function Population(size, nGenes, mutationRate) {
   this.evolve = function (generations) {
     for (let i = 0; i < generations; i++) {
       const pool = this._selectMembersForMating();
+      if (pool.constructor.name === "Chromosome") return pool;
       this._reproduce(pool);
     }
   };
@@ -95,11 +102,5 @@ export function Population(size, nGenes, mutationRate) {
 export function generate(populationSize, nGenes, mutationRate, generations) {
   // Create a population and evolve for N generations
   const population = new Population(populationSize, nGenes, mutationRate);
-  population.evolve(generations);
+  return population.evolve(generations);
 }
-
-/*
-svg
-  .querySelectorAll(".vesselLine")
-  .forEach((polyline) => polyline.remove());
-*/

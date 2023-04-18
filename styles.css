@@ -24,3 +24,9 @@ svg {
   stroke: black;
   stroke-width: 5px;
 }
+
+.success {
+  fill: none;
+  stroke: green;
+  stroke-width: 10px;
+}
