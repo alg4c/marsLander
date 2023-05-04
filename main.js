@@ -1,3 +1,4 @@
 import { generate } from "./modules/geneticAlgorithm.js";
 
-console.log(generate(40, 60, 0.02, 20));
+const solution = generate(40, 40, 0.02, 20);
+console.log(solution || "Solution not found :(");

@@ -30,3 +30,8 @@ svg {
   stroke: green;
   stroke-width: 10px;
 }
+
+p {
+  width: 80vw;
+  overflow-wrap: break-word;
+}
