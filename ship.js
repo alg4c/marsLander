@@ -3,7 +3,6 @@ import { drawLine, intersect } from "./svg.js";
 
 export const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
 const deg_to_rad = (degrees) => degrees * (Math.PI / 180);
-
 const GRAVITY = -3.711;
 
 export const shipFactory = (cmdList) => {
