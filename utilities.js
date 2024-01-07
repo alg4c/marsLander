@@ -1,14 +1,14 @@
-export const svg = document.querySelector("#svg");
+const svg = document.querySelector("#svg");
 
-export const drawLine = (coordinates, name) => {
+const drawLine = (className, ...coordinates) => {
   const svgns = "http://www.w3.org/2000/svg";
   const polyline = document.createElementNS(svgns, "polyline");
   polyline.setAttribute("points", coordinates.join(" "));
-  polyline.setAttribute("class", name);
+  polyline.setAttribute("class", className);
   svg.appendChild(polyline);
 };
 
-export function intersect(x1, y1, x2, y2, x3, y3, x4, y4) {
+function intersect(x1, y1, x2, y2, x3, y3, x4, y4) {
   // Check if none of the lines are of length 0
   if ((x1 === x2 && y1 === y2) || (x3 === x4 && y3 === y4)) {
     return false;
@@ -29,3 +29,9 @@ export function intersect(x1, y1, x2, y2, x3, y3, x4, y4) {
   let y = y1 + ua * (y2 - y1);
   return { x, y };
 }
+
+const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
+
+const degToRad = (degrees) => degrees * (Math.PI / 180);
+
+export { drawLine, intersect, clamp, degToRad };
