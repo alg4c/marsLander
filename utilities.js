@@ -34,4 +34,8 @@ const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
 
 const degToRad = (degrees) => degrees * (Math.PI / 180);
 
-export { drawLine, intersect, clamp, degToRad };
+// randomInt is inclusive of min and max
+const randomInt = (min, max) =>
+  Math.floor(Math.random() * (max - min + 1)) + min;
+
+export { drawLine, intersect, clamp, degToRad, randomInt };
