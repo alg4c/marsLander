@@ -39,8 +39,8 @@ class Ship {
       const { x: x1_1, y: y1_1 } = topography[i];
       const { x: x2_1, y: y2_1 } = topography[i + 1];
       if (this.x >= x1_1 && this.x <= x2_1) {
-        const { x: x1_2, y: y1_2 } = this.previousPosition;
-        const { x: x2_2, y: y2_2 } = this.position;
+        const { x: x1_2, y: y1_2 } = this.log.at(-2);
+        const { x: x2_2, y: y2_2 } = this.log.at(-1);
         return intersect(x1_1, y1_1, x2_1, y2_1, x1_2, y1_2, x2_2, y2_2);
       }
     }
