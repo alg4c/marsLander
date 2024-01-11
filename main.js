@@ -1,6 +1,8 @@
 import Geography from "./geography.js";
 import Ship from "./ship.js";
+import Svg from "./svg.js";
 
+const svg = new Svg("svg");
 const geo = new Geography(
   0,
   100,
@@ -17,17 +19,13 @@ const geo = new Geography(
   6999,
   800
 );
+console.log(geo.coordinates);
 
 const ship = new Ship(2500, 2700, 0, 0, 0, 0, 5501);
 
 const cmd = { rotation: 0, thrust: 0 };
 
-let count = 0;
 while (ship.y > geo.calculateElevation(ship.x)) {
-  console.log(
-    count++,
-    Object.entries(ship).map(([k, v]) => ({ [k]: Math.round(v) }))
-  );
   ship.updateParameters(cmd);
 }
-console.log(ship);
+console.log(ship, ship.reportCrashLocation(geo.coordinates));
