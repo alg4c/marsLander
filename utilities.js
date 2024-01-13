@@ -1,13 +1,3 @@
-const svg = document.querySelector("#svg");
-
-const drawLine = (className, ...coordinates) => {
-  const svgns = "http://www.w3.org/2000/svg";
-  const polyline = document.createElementNS(svgns, "polyline");
-  polyline.setAttribute("points", coordinates.join(" "));
-  polyline.setAttribute("class", className);
-  svg.appendChild(polyline);
-};
-
 function intersect(x1, y1, x2, y2, x3, y3, x4, y4) {
   // Check if none of the lines are of length 0
   if ((x1 === x2 && y1 === y2) || (x3 === x4 && y3 === y4)) {
@@ -38,4 +28,4 @@ const degToRad = (degrees) => degrees * (Math.PI / 180);
 const randomInt = (min, max) =>
   Math.floor(Math.random() * (max - min + 1)) + min;
 
-export { drawLine, intersect, clamp, degToRad, randomInt };
+export { intersect, clamp, degToRad, randomInt };
