@@ -13,16 +13,16 @@ class Geography {
     }
   }
   get landingZone() {
-    for (let i = 0; i < this.coordinates.length; i += 2) {
-      const { x: x1, y: y1 } = this.coordinates[i];
-      const { x: x2, y: y2 } = this.coordinates[i + 1];
+    for (let i = 1; i < this.coordinates.length; i++) {
+      const { x: x1, y: y1 } = this.coordinates[i - 1];
+      const { x: x2, y: y2 } = this.coordinates[i];
       if (y2 === y1) return { x1, x2, y: y2 };
     }
   }
   calculateElevation(x) {
-    for (let i = 0; i < this.coordinates.length; i += 2) {
-      const { x: x1, y: y1 } = this.coordinates[i];
-      const { x: x2, y: y2 } = this.coordinates[i + 1];
+    for (let i = 1; i < this.coordinates.length; i++) {
+      const { x: x1, y: y1 } = this.coordinates[i - 1];
+      const { x: x2, y: y2 } = this.coordinates[i];
       if (x >= x1 && x <= x2) {
         const slope = (y2 - y1) / (x2 - x1);
         const yIntercept = y1 - slope * x1;

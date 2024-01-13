@@ -20,11 +20,13 @@ class Ship {
   }
   updateParameters(command) {
     const { rotation, thrust } = command;
+    // set the max and min rotation to comply with Codin Game site
     this.angle = clamp(this.angle + rotation, -90, 90);
     this.power =
       this.fuel < (this.power + thrust) * 10
         ? 0
-        : clamp(this.power + thrust, 0, 4);
+        : // set the max and min thrust to comply with testing on Codin Game site
+          clamp(this.power + thrust, 0, 3);
     this.fuel -= this.power * 10;
     this.ax = Math.sin(degToRad(this.angle)) * this.power;
     this.ay = Math.cos(degToRad(this.angle)) * this.power + GRAVITY;
@@ -35,9 +37,9 @@ class Ship {
     this.log.push(this.position);
   }
   reportCrashLocation(topography) {
-    for (let i = 0; i < topography.length; i += 2) {
-      const { x: x1_1, y: y1_1 } = topography[i];
-      const { x: x2_1, y: y2_1 } = topography[i + 1];
+    for (let i = 1; i < topography.length; i++) {
+      const { x: x1_1, y: y1_1 } = topography[i - 1];
+      const { x: x2_1, y: y2_1 } = topography[i];
       if (this.x >= x1_1 && this.x <= x2_1) {
         const { x: x1_2, y: y1_2 } = this.log.at(-2);
         const { x: x2_2, y: y2_2 } = this.log.at(-1);

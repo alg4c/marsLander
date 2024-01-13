@@ -13,13 +13,13 @@ svg {
   max-width: 1800px;
 }
 
-.geoline {
+.topography {
   fill: none;
   stroke: red;
   stroke-width: 1rem;
 }
 
-.vesselLine {
+.ship {
   fill: none;
   stroke: black;
   stroke-width: 5px;

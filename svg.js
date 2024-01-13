@@ -2,13 +2,13 @@ class Svg {
   constructor(id) {
     this.id = id;
     this.nameSpace = "http://www.w3.org/2000/svg";
-    this.domRef = document.querySelector(id);
+    this.DOMreference = document.getElementById(id);
   }
   drawLine(className, ...coordinates) {
     const pLine = document.createElementNS(this.nameSpace, "polyline");
     pLine.setAttribute("points", coordinates.join(" "));
     pLine.setAttribute("class", className);
-    document.getElementById(id).appendChild(pLine);
+    this.DOMreference.appendChild(pLine);
   }
 }
 
