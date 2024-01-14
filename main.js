@@ -1,7 +1,7 @@
 import Geography from "./geography.js";
 import Ship from "./ship.js";
 import Svg from "./svg.js";
-import { calculateLinearDistance, randomInt } from "./utilities.js";
+import { calculateLinearDistance, randomInt, clamp } from "./utilities.js";
 
 const geo = new Geography([
   0, 100, 1000, 500, 1500, 1500, 3000, 1000, 4000, 150, 5500, 150, 6999, 800,
@@ -17,7 +17,7 @@ class Gene {
     this.rotation = randomInt(-15, 15);
     this.thrust = randomInt(-1, 1);
     // //TESTING impact EAST of LZ
-    // this.rotation = 15;
+    // this.rotation = 3;
     // this.thrust = 1;
     // //TESTING impact WEST of LZ
     // this.rotation = 0;
@@ -34,9 +34,11 @@ class Gene {
 class Chromosome {
   constructor(numOfGenes) {
     this.genes = new Array(numOfGenes).fill(null).map(() => new Gene());
+    this.uid =
+      Date.now().toString(36) + Math.random().toString(36).substring(2);
   }
-
   fitness(_ship) {
+    console.log(this.uid);
     //TODO add angle, vx, vy considerations to fitness
     const ship = _ship;
     let i = 0; // to iterate in while loop
@@ -51,7 +53,6 @@ class Chromosome {
         break;
       }
     }
-    console.log(ship);
     svg.drawLine(
       "ship",
       ship.log.map((coord) => [coord.x, coord.y])
@@ -81,7 +82,7 @@ class Chromosome {
       distanceToLZ = 0;
     }
 
-    let greatestErrorDistance = Math.max(
+    const greatestErrorDistance = Math.max(
       calculateLinearDistance(
         array.slice(
           0,
@@ -96,7 +97,25 @@ class Chromosome {
         )
       )
     );
-    this.fitness = 1 - distanceToLZ / greatestErrorDistance;
+    const distanceErrorRatio = distanceToLZ / greatestErrorDistance;
+    const distanceFactor = 0.5;
+    const vyErrorRatio = ship.vy < -40 ? clamp(ship.vy - -40, -80, 0) / -80 : 0;
+    const vyFactor = 0.5;
+    console.log(
+      { distanceToLZ },
+      { greatestErrorDistance },
+      { distanceErrorRatio },
+      { distanceFitness: 1 - distanceErrorRatio },
+      { distanceFactor },
+      { shipVY: ship.vy },
+      { greatestAllowableVYError: -80 },
+      { vyErrorRatio },
+      { vyFitness: 1 - vyErrorRatio },
+      { vyFactor }
+    );
+    this.fitness =
+      (1 - distanceErrorRatio) * distanceFactor + (1 - vyErrorRatio) * vyFactor;
+    console.log(this.fitness);
     return this.fitness;
   }
 
@@ -149,8 +168,9 @@ class Population {
     for (let i = 0; i < generations; i++) {
       console.log(`Generation ${i}`);
       const pool = this._selectMembersForMating();
-      if (pool.find((c) => c.fitness === 1))
-        return pool.find((c) => c.fitness === 1);
+      const fitnessThreshold = 1;
+      if (pool.find((c) => c.fitness >= fitnessThreshold))
+        return pool.find((c) => c.fitness >= fitnessThreshold);
       this._reproduce(pool);
     }
   }
@@ -161,5 +181,5 @@ function generate(populationSize, numOfGenes, mutationRate, generations) {
   return population.evolve(generations);
 }
 
-const solution = generate(10, 40, 0.015, 5) || "No solution found";
+const solution = generate(50, 40, 0.015, 10) || "No solution found";
 console.log(solution);
