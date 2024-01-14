@@ -15,9 +15,6 @@ class Ship {
     this.fuel = fuel;
     this.log = [{ x, y }];
   }
-  get position() {
-    return { x: this.x, y: this.y };
-  }
   updateParameters(command) {
     const { rotation, thrust } = command;
     // set the max and min rotation to comply with Codin Game site
@@ -26,7 +23,7 @@ class Ship {
       this.fuel < (this.power + thrust) * 10
         ? 0
         : // set the max and min thrust to comply with testing on Codin Game site
-          clamp(this.power + thrust, 0, 3);
+          clamp(this.power + thrust, 0, 4);
     this.fuel -= this.power * 10;
     this.ax = Math.sin(degToRad(this.angle)) * this.power;
     this.ay = Math.cos(degToRad(this.angle)) * this.power + GRAVITY;
@@ -34,7 +31,7 @@ class Ship {
     this.y += this.vy + 0.5 * this.ay;
     this.vx += this.ax;
     this.vy += this.ay;
-    this.log.push(this.position);
+    this.log.push({ x: this.x, y: this.y });
   }
   reportCrashLocation(topography) {
     for (let i = 1; i < topography.length; i++) {

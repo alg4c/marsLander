@@ -28,4 +28,14 @@ const degToRad = (degrees) => degrees * (Math.PI / 180);
 const randomInt = (min, max) =>
   Math.floor(Math.random() * (max - min + 1)) + min;
 
-export { intersect, clamp, degToRad, randomInt };
+const calculateLinearDistance = (array) => {
+  let distance = 0;
+  for (let i = 1; i < array.length; i++) {
+    const { x: x1, y: y1 } = array[i - 1];
+    const { x: x2, y: y2 } = array[i];
+    distance += Math.hypot(y2 - y1, x2 - x1);
+  }
+  return distance;
+};
+
+export { intersect, clamp, degToRad, randomInt, calculateLinearDistance };
