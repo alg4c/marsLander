@@ -1,7 +1,7 @@
 import Geography from "./geography.js";
 import Ship from "./ship.js";
 import Svg from "./svg.js";
-import { calculateLinearDistance } from "./utilities.js";
+import { calculateLinearDistance, randomInt } from "./utilities.js";
 
 const geo = new Geography([
   0, 100, 1000, 500, 1500, 1500, 3000, 1000, 4000, 150, 5500, 150, 6999, 800,
@@ -14,17 +14,20 @@ svg.drawLine(
 
 class Gene {
   constructor() {
-    // this.rotation = randomInt(-15, 15);
-    // this.thrust = randomInt(-1, 1);
+    this.rotation = randomInt(-15, 15);
+    this.thrust = randomInt(-1, 1);
     // //TESTING impact EAST of LZ
     // this.rotation = 15;
     // this.thrust = 1;
-    //TESTING impact WEST of LZ
-    this.rotation = 0;
-    this.thrust = 0;
-    //TESTING impact INSIDE of LZ
-    this.rotation = 15;
-    this.thrust = 1;
+    // //TESTING impact WEST of LZ
+    // this.rotation = 0;
+    // this.thrust = 0;
+    // //TESTING impact INSIDE of LZ
+    // this.rotation = 15;
+    // this.thrust = 1;
+    // //TESTING OUT OF BOUNDS
+    // this.rotation = -15;
+    // this.thrust = 1;
   }
 }
 
@@ -93,12 +96,13 @@ class Chromosome {
         )
       )
     );
-    return 1 - distanceToLZ / greatestErrorDistance;
+    this.fitness = 1 - distanceToLZ / greatestErrorDistance;
+    return this.fitness;
   }
 
   crossover(partner) {
-    const child = new Chromosome(numOfGenes);
-    const midpoint = randomInt(0, numOfGenes);
+    const child = new Chromosome(this.genes.length);
+    const midpoint = randomInt(0, this.genes.length - 1);
     for (let i = 0; i < child.genes.length; i++) {
       child.genes[i] = i < midpoint ? this.genes[i] : partner.genes[i];
     }
@@ -134,8 +138,8 @@ class Population {
   }
   _reproduce(matingPool) {
     for (let i = 0; i < this.chromosomes.length; i++) {
-      const parentA = matingPool[random(0, matingPool.length)];
-      const parentB = matingPool[random(0, matingPool.length)];
+      const parentA = matingPool[randomInt(0, matingPool.length - 1)];
+      const parentB = matingPool[randomInt(0, matingPool.length - 1)];
       const child = parentA.crossover(parentB);
       child.mutate(this.mutationRate);
       this.chromosomes[i] = child;
@@ -143,7 +147,10 @@ class Population {
   }
   evolve(generations) {
     for (let i = 0; i < generations; i++) {
+      console.log(`Generation ${i}`);
       const pool = this._selectMembersForMating();
+      if (pool.find((c) => c.fitness === 1))
+        return pool.find((c) => c.fitness === 1);
       this._reproduce(pool);
     }
   }
@@ -154,4 +161,5 @@ function generate(populationSize, numOfGenes, mutationRate, generations) {
   return population.evolve(generations);
 }
 
-export { Gene, Chromosome, Population, generate };
+const solution = generate(10, 40, 0.015, 5) || "No solution found";
+console.log(solution);
