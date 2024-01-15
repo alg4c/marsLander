@@ -38,8 +38,7 @@ class Chromosome {
       Date.now().toString(36) + Math.random().toString(36).substring(2);
   }
   fitness(_ship) {
-    console.log(this.uid);
-    //TODO add angle, vx, vy considerations to fitness
+    //TODO add angle, vx considerations to fitness
     const ship = _ship;
     let i = 0; // to iterate in while loop
     while (true) {
@@ -60,7 +59,7 @@ class Chromosome {
     let array = [...geo.coordinates, { x: ship.x, y: ship.y }].sort(
       (a, b) => a.x - b.x
     );
-    let distanceToLZ = 0;
+    let distanceToLZ;
     let distanceArr;
     if (ship.x < geo.landingZone.lzx1) {
       // if ship crashes WEST of LZ
@@ -101,21 +100,10 @@ class Chromosome {
     const distanceFactor = 0.5;
     const vyErrorRatio = ship.vy < -40 ? clamp(ship.vy - -40, -80, 0) / -80 : 0;
     const vyFactor = 0.5;
-    console.log(
-      { distanceToLZ },
-      { greatestErrorDistance },
-      { distanceErrorRatio },
-      { distanceFitness: 1 - distanceErrorRatio },
-      { distanceFactor },
-      { shipVY: ship.vy },
-      { greatestAllowableVYError: -80 },
-      { vyErrorRatio },
-      { vyFitness: 1 - vyErrorRatio },
-      { vyFactor }
-    );
+
     this.fitness =
       (1 - distanceErrorRatio) * distanceFactor + (1 - vyErrorRatio) * vyFactor;
-    console.log(this.fitness);
+    console.log(this, ship, `fitness: ${this.fitness}`);
     return this.fitness;
   }
 
