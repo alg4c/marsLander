@@ -169,5 +169,5 @@ function generate(populationSize, numOfGenes, mutationRate, generations) {
   return population.evolve(generations);
 }
 
-const solution = generate(50, 40, 0.015, 10) || "No solution found";
+const solution = generate(20, 40, 0.015, 50) || "No solution found";
 console.log(solution);
