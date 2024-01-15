@@ -97,13 +97,23 @@ class Chromosome {
       )
     );
     const distanceErrorRatio = distanceToLZ / greatestErrorDistance;
-    const distanceFactor = 0.5;
+    const distanceFactor = 0.4;
+
     const vyErrorRatio = ship.vy < -40 ? clamp(ship.vy - -40, -80, 0) / -80 : 0;
-    const vyFactor = 0.5;
+    const vyFactor = 0.1;
+
+    const vxErrorRatio = clamp(Math.abs(ship.vx) - 20, 0, 40) / 40;
+    const vxFactor = 0.1;
+
+    const angleErrorRatio =
+      Math.abs(ship.angle) > 15 ? (Math.abs(ship.angle) - 15) / 75 : 0;
+    const angleFactor = 0.4;
 
     this.fitness =
-      (1 - distanceErrorRatio) * distanceFactor + (1 - vyErrorRatio) * vyFactor;
-    console.log(this, ship, `fitness: ${this.fitness}`);
+      (1 - distanceErrorRatio) * distanceFactor +
+      (1 - vyErrorRatio) * vyFactor +
+      (1 - vxErrorRatio) * vxFactor +
+      (1 - angleErrorRatio) * angleFactor;
     return this.fitness;
   }
 
@@ -169,5 +179,5 @@ function generate(populationSize, numOfGenes, mutationRate, generations) {
   return population.evolve(generations);
 }
 
-const solution = generate(20, 40, 0.015, 50) || "No solution found";
+const solution = generate(50, 40, 0.02, 50) || "No solution found";
 console.log(solution);
